@@ -1,3 +1,9 @@
+1 -> Conectei o banco de dados no dbeaver, criei os bancos (create database)
+E depois conectei todos os bancos de dados:
+create database icomprasprodutos;
+create database icomprasclientes;
+create database icompraspedidos;
+
 # 🚀 Sistema de Compras — Microserviços com Spring Boot
 
 Projeto desenvolvido ao longo do curso, com o objetivo de construir uma **plataforma de compras distribuída baseada em arquitetura de microsserviços**, utilizando tecnologias modernas do ecossistema Java.
