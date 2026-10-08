@@ -1,0 +1,20 @@
+spring:
+    application:
+        name: produtos
+    datasource:
+        url: jdbc:postgresql://localhost:5432/icomprasprodutos
+        username: postgres
+        password: postgres
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            ddl-auto: none #isso porque ja tenho o banco de dados criado,
+                           # o certo é criar o banco de dados e depois mapear ele no spring
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+
+server:
+    port: 8080
