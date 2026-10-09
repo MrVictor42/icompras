@@ -3,6 +3,7 @@ package io.github.mrvictor.icompras.produtos.controller;
 import io.github.mrvictor.icompras.produtos.model.Produto;
 import io.github.mrvictor.icompras.produtos.service.ProdutoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +16,7 @@ public class ProdutoController {
 
     @PostMapping
     public ResponseEntity<Produto> salvar(@RequestBody Produto produto) {
-        produtoService.salvar(produto);
-
-        return ResponseEntity.ok(produto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produto));
     }
 
     @GetMapping("{codigo}")
