@@ -47,6 +47,6 @@ public class Pedido {
     @Transient //não salva no banco
     private DadosPagamento dadosPagamento;
 
-    @OneToMany(mappedBy = "codigoPedido")
+    @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itens;
 }

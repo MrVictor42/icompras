@@ -36,9 +36,17 @@ public interface PedidoMapper {
         pedido.setStatus(StatusPedido.REALIZADO);
         pedido.setDataPedido(LocalDateTime.now());
         pedido.setTotal(calcularTotal(pedido));
+
+        if (pedido.getItens() != null) {
+            pedido.getItens().forEach(it -> it.setPedido(pedido));
+        }
     }
 
     private static @NonNull BigDecimal calcularTotal(Pedido pedido) {
+        if (pedido.getItens() == null) {
+            return BigDecimal.ZERO;
+        }
+
         return pedido.getItens().stream().map(item ->
                 item.getValorUnitario().multiply(BigDecimal.valueOf(item.getQuantidade()))
         ).reduce(BigDecimal.ZERO, BigDecimal::add).abs();

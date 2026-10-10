@@ -16,8 +16,9 @@ public class ItemPedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
-    @Column(name = "codigo_pedido")
-    private Long codigoPedido;
+    @JoinColumn(name = "codigo_pedido")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Pedido pedido;
 
     @Column(name = "codigo_produto")
     private Long codigoProduto;
