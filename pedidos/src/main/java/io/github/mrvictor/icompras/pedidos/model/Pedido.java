@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
@@ -42,4 +43,10 @@ public class Pedido {
 
     @Column(name = "url_nf")
     private String urlNotaFiscal;
+
+    @Transient //não salva no banco
+    private DadosPagamento dadosPagamento;
+
+    @OneToMany(mappedBy = "codigoPedido")
+    private List<ItemPedido> itens;
 }
