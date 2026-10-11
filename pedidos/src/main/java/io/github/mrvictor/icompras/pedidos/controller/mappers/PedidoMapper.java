@@ -48,7 +48,7 @@ public interface PedidoMapper {
         }
 
         return pedido.getItens().stream().map(item ->
-                item.getValorUnitario().multiply(BigDecimal.valueOf(item.getQuantidade()))
+            item.getValorUnitario().multiply(BigDecimal.valueOf(item.getQuantidade()))
         ).reduce(BigDecimal.ZERO, BigDecimal::add).abs();
     }
 }
