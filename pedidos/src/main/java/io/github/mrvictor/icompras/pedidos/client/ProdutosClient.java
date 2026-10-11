@@ -15,4 +15,4 @@ public interface ProdutosClient {
      */
     @GetMapping("{codigo}")
     ResponseEntity<ProdutoRepresentation> obterDados(@PathVariable Long codigo);
-}
+} 

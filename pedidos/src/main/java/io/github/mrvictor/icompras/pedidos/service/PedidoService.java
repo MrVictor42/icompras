@@ -1,7 +1,10 @@
 package io.github.mrvictor.icompras.pedidos.service;
 
 import io.github.mrvictor.icompras.pedidos.client.ServicoBancarioClient;
+import io.github.mrvictor.icompras.pedidos.controller.dto.RecebimentoCallbackPagamentoDTO;
 import io.github.mrvictor.icompras.pedidos.model.Pedido;
+import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
+import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import io.github.mrvictor.icompras.pedidos.repository.ItemPedidoRepository;
 import io.github.mrvictor.icompras.pedidos.repository.PedidoRepository;
 import io.github.mrvictor.icompras.pedidos.validator.PedidoValidator;
@@ -31,6 +34,25 @@ public class PedidoService {
         enviarSolicitacaoPagamento(pedido);
 
         return pedido;
+    }
+
+    public void atualizarStatusPagamento(RecebimentoCallbackPagamentoDTO recebimentoCallbackPagamentoDTO) {
+        Pedido pedido = pedidoRepository.findByCodigoAndChavePagamento(
+            recebimentoCallbackPagamentoDTO.codigo(), recebimentoCallbackPagamentoDTO.chavePagamento()
+        ).orElseThrow(() -> new ValidationException(
+            "Pedido Não Encontrado",
+            "Pedido não encontrado para o código " + recebimentoCallbackPagamentoDTO.codigo() +
+            " e a chave pagamento " + recebimentoCallbackPagamentoDTO.chavePagamento()
+        ));
+
+        if(recebimentoCallbackPagamentoDTO.status()) {
+            pedido.setStatus(StatusPedido.PAGO);
+        } else {
+            pedido.setStatus(StatusPedido.ERRO_PAGAMENTO);
+            pedido.setObservacoes(recebimentoCallbackPagamentoDTO.observacoes());
+        }
+
+        pedidoRepository.save(pedido);
     }
 
     private void enviarSolicitacaoPagamento(Pedido pedido) {
