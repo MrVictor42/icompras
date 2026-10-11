@@ -7,6 +7,7 @@ import io.github.mrvictor.icompras.pedidos.client.representation.ClienteRepresen
 import io.github.mrvictor.icompras.pedidos.client.representation.ProdutoRepresentation;
 import io.github.mrvictor.icompras.pedidos.model.ItemPedido;
 import io.github.mrvictor.icompras.pedidos.model.Pedido;
+import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,9 @@ public class PedidoValidator {
                 log.info("Cliente de código {} encontrado: {}", cliente.codigo(), cliente.nome());
             }
         } catch(FeignException.NotFound ex) {
-            log.error("Cliente não encontrado");
+            String message = String.format("Cliente de código %d não encontrado", codigoCliente);
+
+            throw new ValidationException("codigoCliente", message);
         }
     }
 
@@ -49,7 +52,9 @@ public class PedidoValidator {
                 log.info("Produto de código {} encontrado: {}", produto.codigo(), produto.nome());
             }
         } catch(FeignException.NotFound ex) {
-            log.error("Produto não encontrado");
+            String message = String.format("Produto de código %d não encontrado", itemPedido.getCodigoProduto());
+
+            throw new ValidationException("codigoProduto", message);
         }
     }
 }

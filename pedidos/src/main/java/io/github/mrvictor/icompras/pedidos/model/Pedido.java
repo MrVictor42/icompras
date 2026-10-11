@@ -1,6 +1,6 @@
 package io.github.mrvictor.icompras.pedidos.model;
 
-import io.github.mrvictor.icompras.pedidos.enums.StatusPedido;
+import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

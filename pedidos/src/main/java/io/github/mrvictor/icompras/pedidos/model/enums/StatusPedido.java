@@ -1,4 +1,4 @@
-package io.github.mrvictor.icompras.pedidos.enums;
+package io.github.mrvictor.icompras.pedidos.model.enums;
 
 public enum StatusPedido {
     REALIZADO,

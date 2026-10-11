@@ -1,6 +1,6 @@
 package io.github.mrvictor.icompras.pedidos.model;
 
-import io.github.mrvictor.icompras.pedidos.enums.TipoPagamento;
+import io.github.mrvictor.icompras.pedidos.model.enums.TipoPagamento;
 import lombok.Data;
 
 @Data
