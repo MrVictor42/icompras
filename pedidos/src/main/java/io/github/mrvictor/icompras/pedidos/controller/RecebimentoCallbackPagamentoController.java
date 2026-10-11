@@ -2,6 +2,8 @@ package io.github.mrvictor.icompras.pedidos.controller;
 
 import io.github.mrvictor.icompras.pedidos.controller.dto.AdicaoNovoPagamentoDTO;
 import io.github.mrvictor.icompras.pedidos.controller.dto.RecebimentoCallbackPagamentoDTO;
+import io.github.mrvictor.icompras.pedidos.model.ErroResposta;
+import io.github.mrvictor.icompras.pedidos.model.exception.ItemNaoEncontradoException;
 import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import io.github.mrvictor.icompras.pedidos.service.PedidoService;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +41,12 @@ public class RecebimentoCallbackPagamentoController {
                 adicaoNovoPagamentoDTO.dados(),
                 adicaoNovoPagamentoDTO.tipoPagamento()
             );
-        } catch (ValidationException e) {
-            log.error("Erro ao adicionar novo pagamento: {}", e.getMessage());
-        }
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        } catch (ItemNaoEncontradoException e) {
+            return ResponseEntity.badRequest().body(
+                new ErroResposta("Item não encontrado", "codigoPedido", e.getMessage())
+            );
+        }
     }
 }

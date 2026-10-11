@@ -6,6 +6,7 @@ import io.github.mrvictor.icompras.pedidos.model.DadosPagamento;
 import io.github.mrvictor.icompras.pedidos.model.Pedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.TipoPagamento;
+import io.github.mrvictor.icompras.pedidos.model.exception.ItemNaoEncontradoException;
 import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import io.github.mrvictor.icompras.pedidos.repository.ItemPedidoRepository;
 import io.github.mrvictor.icompras.pedidos.repository.PedidoRepository;
@@ -60,9 +61,8 @@ public class PedidoService {
 
     @Transactional
     public void adicionarNovoPagamento(Long codigoPedido, String dadosCartao, TipoPagamento tipoPagamento) {
-        Pedido pedido = pedidoRepository.findById(codigoPedido).orElseThrow(() -> new ValidationException(
-            "Pedido Não Encontrado",
-            "Pedido não encontrado para o código " + codigoPedido
+        Pedido pedido = pedidoRepository.findById(codigoPedido).orElseThrow(() -> new ItemNaoEncontradoException(
+            "Pedido não encontrado para o código informado."
         ));
         DadosPagamento dadosPagamento = new DadosPagamento();
 
