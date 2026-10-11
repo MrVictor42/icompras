@@ -2,8 +2,10 @@ package io.github.mrvictor.icompras.pedidos.service;
 
 import io.github.mrvictor.icompras.pedidos.client.ServicoBancarioClient;
 import io.github.mrvictor.icompras.pedidos.controller.dto.RecebimentoCallbackPagamentoDTO;
+import io.github.mrvictor.icompras.pedidos.model.DadosPagamento;
 import io.github.mrvictor.icompras.pedidos.model.Pedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
+import io.github.mrvictor.icompras.pedidos.model.enums.TipoPagamento;
 import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import io.github.mrvictor.icompras.pedidos.repository.ItemPedidoRepository;
 import io.github.mrvictor.icompras.pedidos.repository.PedidoRepository;
@@ -49,8 +51,31 @@ public class PedidoService {
             pedido.setStatus(StatusPedido.PAGO);
         } else {
             pedido.setStatus(StatusPedido.ERRO_PAGAMENTO);
-            pedido.setObservacoes(recebimentoCallbackPagamentoDTO.observacoes());
         }
+
+        pedido.setObservacoes(recebimentoCallbackPagamentoDTO.observacoes());
+
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void adicionarNovoPagamento(Long codigoPedido, String dadosCartao, TipoPagamento tipoPagamento) {
+        Pedido pedido = pedidoRepository.findById(codigoPedido).orElseThrow(() -> new ValidationException(
+            "Pedido Não Encontrado",
+            "Pedido não encontrado para o código " + codigoPedido
+        ));
+        DadosPagamento dadosPagamento = new DadosPagamento();
+
+        dadosPagamento.setTipoPagamento(tipoPagamento);
+        dadosPagamento.setDados(dadosCartao);
+
+        pedido.setDadosPagamento(dadosPagamento);
+        pedido.setStatus(StatusPedido.REALIZADO);
+        pedido.setObservacoes("Novo Pagamento Realizado!! Aguardando o novo processamento.");
+
+        String chavePagamento = servicoBancarioClient.solicitarPagamento(pedido);
+
+        pedido.setChavePagamento(chavePagamento);
 
         pedidoRepository.save(pedido);
     }

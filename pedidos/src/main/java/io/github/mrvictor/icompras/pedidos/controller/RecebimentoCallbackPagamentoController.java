@@ -1,5 +1,6 @@
 package io.github.mrvictor.icompras.pedidos.controller;
 
+import io.github.mrvictor.icompras.pedidos.controller.dto.AdicaoNovoPagamentoDTO;
 import io.github.mrvictor.icompras.pedidos.controller.dto.RecebimentoCallbackPagamentoDTO;
 import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
 import io.github.mrvictor.icompras.pedidos.service.PedidoService;
@@ -28,5 +29,20 @@ public class RecebimentoCallbackPagamentoController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/pagamentos")
+    public ResponseEntity<Object> adicionarNovoPagamento(@RequestBody AdicaoNovoPagamentoDTO adicaoNovoPagamentoDTO) {
+        try {
+            pedidoService.adicionarNovoPagamento(
+                adicaoNovoPagamentoDTO.codigoPedido(),
+                adicaoNovoPagamentoDTO.dados(),
+                adicaoNovoPagamentoDTO.tipoPagamento()
+            );
+        } catch (ValidationException e) {
+            log.error("Erro ao adicionar novo pagamento: {}", e.getMessage());
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
