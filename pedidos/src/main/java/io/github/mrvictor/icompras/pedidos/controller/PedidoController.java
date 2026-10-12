@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("pedidos")
 @RequiredArgsConstructor
@@ -42,5 +44,12 @@ public class PedidoController {
                 .map(detalhePedidoMapper::map)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DetalhePedidoRepresentation>> obterDetalhesPedido() {
+        List<DetalhePedidoRepresentation> detalhePedidos = pedidoService.carregarTodosPedidos().stream().map(detalhePedidoMapper::map).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(detalhePedidos);
     }
 }

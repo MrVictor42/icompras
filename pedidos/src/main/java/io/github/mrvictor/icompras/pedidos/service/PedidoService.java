@@ -13,6 +13,8 @@ import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.TipoPagamento;
 import io.github.mrvictor.icompras.pedidos.model.exception.ItemNaoEncontradoException;
 import io.github.mrvictor.icompras.pedidos.model.exception.ValidationException;
+import io.github.mrvictor.icompras.pedidos.publisher.DetalhePedidoMapper;
+import io.github.mrvictor.icompras.pedidos.publisher.PagamentoPublisher;
 import io.github.mrvictor.icompras.pedidos.repository.ItemPedidoRepository;
 import io.github.mrvictor.icompras.pedidos.repository.PedidoRepository;
 import io.github.mrvictor.icompras.pedidos.validator.PedidoValidator;
@@ -34,6 +36,8 @@ public class PedidoService {
     private final ClientesClient apiClient;
     private final ProdutosClient apiProdutos;
     private final ServicoBancarioClient servicoBancarioClient;
+    private final PagamentoPublisher pagamentoPublisher;
+    private final DetalhePedidoMapper detalhePedidoMapper;
 
     /*
         Para não salvar o pedido antes e depois que conseguir a chave pagamento abrir outra transação e salvar de novo
@@ -61,6 +65,11 @@ public class PedidoService {
 
         if(recebimentoCallbackPagamentoDTO.status()) {
             pedido.setStatus(StatusPedido.PAGO);
+
+            carregarDadosCliente(pedido);
+            carregarItensPedido(pedido);
+
+            pagamentoPublisher.publicar(pedido);
         } else {
             pedido.setStatus(StatusPedido.ERRO_PAGAMENTO);
         }
@@ -100,6 +109,17 @@ public class PedidoService {
         return pedido;
     }
 
+    public List<Pedido> carregarTodosPedidos() {
+        List<Pedido> pedidos = pedidoRepository.findAll();
+
+        pedidos.forEach(pedido -> {
+            carregarDadosCliente(pedido);
+            carregarItensPedido(pedido);
+        });
+
+        return pedidos;
+    }
+
     private void carregarDadosCliente(Pedido pedido) {
         Long codigoCliente = pedido.getCodigoCliente();
         ResponseEntity<ClienteRepresentation> response = apiClient.obterDados(codigoCliente);
@@ -108,7 +128,7 @@ public class PedidoService {
     }
 
     private void carregarItensPedido(Pedido pedido) {
-        List<ItemPedido> itemPedidoList = itemPedidoRepository.findByCodigoProduto(pedido.getCodigo());
+        List<ItemPedido> itemPedidoList = itemPedidoRepository.findByPedido(pedido);
 
         pedido.setItens(itemPedidoList);
         pedido.getItens().forEach(this::carregarDadosProduto);
