@@ -1,8 +1,13 @@
 package io.github.mrvictor.icompras.pedidos.service;
 
+import io.github.mrvictor.icompras.pedidos.client.ClientesClient;
+import io.github.mrvictor.icompras.pedidos.client.ProdutosClient;
 import io.github.mrvictor.icompras.pedidos.client.ServicoBancarioClient;
+import io.github.mrvictor.icompras.pedidos.client.representation.ClienteRepresentation;
+import io.github.mrvictor.icompras.pedidos.client.representation.ProdutoRepresentation;
 import io.github.mrvictor.icompras.pedidos.controller.dto.RecebimentoCallbackPagamentoDTO;
 import io.github.mrvictor.icompras.pedidos.model.DadosPagamento;
+import io.github.mrvictor.icompras.pedidos.model.ItemPedido;
 import io.github.mrvictor.icompras.pedidos.model.Pedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
 import io.github.mrvictor.icompras.pedidos.model.enums.TipoPagamento;
@@ -13,7 +18,11 @@ import io.github.mrvictor.icompras.pedidos.repository.PedidoRepository;
 import io.github.mrvictor.icompras.pedidos.validator.PedidoValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +31,8 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ItemPedidoRepository itemPedidoRepository;
     private final PedidoValidator pedidoValidator;
+    private final ClientesClient apiClient;
+    private final ProdutosClient apiProdutos;
     private final ServicoBancarioClient servicoBancarioClient;
 
     /*
@@ -78,6 +89,38 @@ public class PedidoService {
         pedido.setChavePagamento(chavePagamento);
 
         pedidoRepository.save(pedido);
+    }
+
+    public Optional<Pedido> carregarDadosCompletosPedido(Long codigoPedido) {
+        Optional<Pedido> pedido = pedidoRepository.findById(codigoPedido);
+
+        pedido.ifPresent(this::carregarDadosCliente);
+        pedido.ifPresent(this::carregarItensPedido);
+
+        return pedido;
+    }
+
+    private void carregarDadosCliente(Pedido pedido) {
+        Long codigoCliente = pedido.getCodigoCliente();
+        ResponseEntity<ClienteRepresentation> response = apiClient.obterDados(codigoCliente);
+
+        pedido.setDadosCliente(response.getBody());
+    }
+
+    private void carregarItensPedido(Pedido pedido) {
+        List<ItemPedido> itemPedidoList = itemPedidoRepository.findByCodigoProduto(pedido.getCodigo());
+
+        pedido.setItens(itemPedidoList);
+        pedido.getItens().forEach(this::carregarDadosProduto);
+    }
+
+    private void carregarDadosProduto(ItemPedido itemPedido) {
+        Long codigoProduto = itemPedido.getCodigoProduto();
+        ResponseEntity<ProdutoRepresentation> response = apiProdutos.obterDados(codigoProduto);
+
+        if(response != null && response.getBody() != null) {
+            itemPedido.setNome(response.getBody().nome());
+        }
     }
 
     private void enviarSolicitacaoPagamento(Pedido pedido) {
