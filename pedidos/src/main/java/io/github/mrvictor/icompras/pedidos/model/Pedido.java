@@ -1,5 +1,6 @@
 package io.github.mrvictor.icompras.pedidos.model;
 
+import io.github.mrvictor.icompras.pedidos.client.representation.ClienteRepresentation;
 import io.github.mrvictor.icompras.pedidos.model.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -46,6 +47,9 @@ public class Pedido {
 
     @Transient //não salva no banco
     private DadosPagamento dadosPagamento;
+
+    @Transient
+    private ClienteRepresentation dadosCliente;
 
     @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itens;
