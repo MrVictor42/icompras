@@ -16,6 +16,7 @@ public interface DetalhePedidoMapper {
     @Mapping(source = "dadosCliente.numero", target = "numero")
     @Mapping(source = "dadosCliente.bairro", target = "bairro")
     @Mapping(source = "dadosCliente.email", target = "email")
+    @Mapping(source = "dadosCliente.telefone", target = "telefone")
     @Mapping(source = "dataPedido", target = "dataPedido", dateFormat = "yyyy-MM-dd")
     @Mapping(source = "total", target = "total")
     @Mapping(source = "status", target = "status")
