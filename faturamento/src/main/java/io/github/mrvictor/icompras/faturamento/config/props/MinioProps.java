@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "minio")
+@ConfigurationProperties(prefix = "rustfs")
 @Data
 public class MinioProps {
 
