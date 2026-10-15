@@ -21,7 +21,13 @@ public class AtualizacaoStatusPedidoService {
         );
 
         pedido.setStatus(status);
-        pedido.setUrlNotaFiscal(urlNotaFiscal);
-        pedido.setCodigoRastreio(codigoRastreio);
+
+        if(codigoRastreio != null) {
+            pedido.setCodigoRastreio(codigoRastreio);
+        }
+
+        if(urlNotaFiscal != null) {
+            pedido.setUrlNotaFiscal(urlNotaFiscal);
+        }
     }
 }
