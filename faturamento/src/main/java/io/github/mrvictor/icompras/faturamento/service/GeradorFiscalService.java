@@ -3,6 +3,7 @@ package io.github.mrvictor.icompras.faturamento.service;
 import io.github.mrvictor.icompras.faturamento.bucket.BucketFile;
 import io.github.mrvictor.icompras.faturamento.bucket.BucketService;
 import io.github.mrvictor.icompras.faturamento.model.Pedido;
+import io.github.mrvictor.icompras.faturamento.publisher.FaturamentoPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class GeradorFiscalService {
     @Value("classpath:reports/logo.png")
     private Resource logo;
     private final BucketService bucketService;
+    private final FaturamentoPublisher faturamentoPublisher;
 
     public void gerar(Pedido pedido) {
         log.info("Gerada nota fiscal para o pedido {}", pedido.codigo());
@@ -40,6 +43,12 @@ public class GeradorFiscalService {
             );
 
             bucketService.upload(file);
+
+            String urlArquivo = bucketService.getURL(nomeArquivo);
+
+            faturamentoPublisher.publicar(pedido, urlArquivo);
+
+            log.info("Gerada nota fiscal, nota do arquivo {}", nomeArquivo);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -59,7 +68,7 @@ public class GeradorFiscalService {
         }
     }
 
-    private Map<String, Object> createParams(Pedido pedido) {
+    private Map<String, Object> createParams(Pedido pedido) throws IOException {
         Map<String, Object> params = new HashMap<>();
 
         params.put("NOME", pedido.cliente().nome());
@@ -72,6 +81,8 @@ public class GeradorFiscalService {
 
         params.put("DATA_PEDIDO", pedido.data());
         params.put("TOTAL_PEDIDO", pedido.total());
+
+        params.put("LOGO", logo.getFile().getAbsolutePath());
 
         return params;
     }
