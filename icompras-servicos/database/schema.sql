@@ -2,7 +2,8 @@ CREATE database IF NOT EXISTS icomprasprodutos;
 create table if not exists produtos (
     codigo serial not null primary key,
     nome varchar(100) not null,
-    valor_unitario decimal(16,2) not null
+    valor_unitario decimal(16,2) not null,
+    ativo boolean
 );
 
 CREATE database IF NOT EXISTS icomprasclientes;
@@ -14,7 +15,8 @@ create table if not exists clientes(
     numero varchar(10),
     bairro varchar(100),
     email varchar(150),
-    telefone varchar(20)
+    telefone varchar(20),
+    ativo boolean
 );
 
 CREATE database icompraspedidos;

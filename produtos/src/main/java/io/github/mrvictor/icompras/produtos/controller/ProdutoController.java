@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("produtos")
@@ -25,5 +28,21 @@ public class ProdutoController {
                 .obterPorCodigo(codigo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("{codigo}")
+    public ResponseEntity<Void> deletar(@PathVariable Long codigo) {
+        Produto produto = produtoService.obterPorCodigo(codigo).orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "Produto Inexistente"
+        ));
+
+        produtoService.deletar(produto);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Produto>> obterTodos() {
+        return ResponseEntity.status(HttpStatus.OK).body(produtoService.obterTodos());
     }
 }

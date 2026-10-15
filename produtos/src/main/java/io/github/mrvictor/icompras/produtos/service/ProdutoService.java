@@ -5,6 +5,7 @@ import io.github.mrvictor.icompras.produtos.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,5 +20,15 @@ public class ProdutoService {
 
     public Optional<Produto> obterPorCodigo(Long codigo) {
         return produtoRepository.findById(codigo);
+    }
+
+    public void deletar(Produto produto) {
+        produto.setAtivo(false);
+
+        produtoRepository.save(produto);
+    }
+
+    public List<Produto> obterTodos() {
+        return produtoRepository.findAllByAtivoTrue();
     }
 }
