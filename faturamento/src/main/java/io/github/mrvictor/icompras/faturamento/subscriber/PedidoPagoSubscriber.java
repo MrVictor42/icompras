@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 public class PedidoPagoSubscriber {
 
     private final ObjectMapper objectMapper;
-    private final GeradorFiscalService geradorFiscalService;
     private final PedidoMapper pedidoMapper;
+    private final GeradorFiscalService geradorFiscalService;
 
     @KafkaListener(groupId = "${spring.kafka.consumer.group-id}", topics = "${icompras.config.kafka.topics.pedidos-pagos}")
     public void listen(String json) {
