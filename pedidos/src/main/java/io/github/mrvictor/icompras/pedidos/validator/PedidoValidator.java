@@ -36,6 +36,10 @@ public class PedidoValidator {
             if(cliente != null) {
                 log.info("Cliente de código {} encontrado: {}", cliente.codigo(), cliente.nome());
             }
+
+            if(cliente != null && !cliente.ativo()) {
+                throw new ValidationException("codigoCliente", "Cliente Inativo");
+            }
         } catch(FeignException.NotFound ex) {
             String message = String.format("Cliente de código %d não encontrado", codigoCliente);
 
@@ -50,6 +54,10 @@ public class PedidoValidator {
 
             if(produto != null) {
                 log.info("Produto de código {} encontrado: {}", produto.codigo(), produto.nome());
+            }
+
+            if(produto != null && !produto.ativo()) {
+                throw new ValidationException("codigoProduto", "Produto Inativo");
             }
         } catch(FeignException.NotFound ex) {
             String message = String.format("Produto de código %d não encontrado", itemPedido.getCodigoProduto());

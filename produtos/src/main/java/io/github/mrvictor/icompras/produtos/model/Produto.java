@@ -19,4 +19,9 @@ public class Produto {
     private BigDecimal valorUnitario;
     @Column(name = "ativo")
     private boolean ativo;
+
+    @PrePersist
+    public void prePersist() {
+        setAtivo(true);
+    }
 }
