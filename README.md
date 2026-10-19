@@ -37,7 +37,7 @@ Uma visão simplificada da arquitetura:
                                   │
                                   ▼
                          ┌──────────────────┐
-                         │    API / Gateway │
+                         │    API Gateway   │
                          └────────┬─────────┘
                                   │
                   ┌───────────────┼───────────────┐
@@ -65,7 +65,7 @@ Uma visão simplificada da arquitetura:
                          └──────────────────┘
 ```
 
-> A arquitetura poderá evoluir ao longo do curso conforme novos conceitos e componentes forem apresentados.
+> O Eureka Server mantém o registro dos serviços; o API Gateway encaminha as chamadas externas usando descoberta e balanceamento por nome.
 
 ---
 
@@ -105,6 +105,8 @@ Uma visão simplificada da arquitetura:
 * Containers
 * Redes entre serviços
 * Configuração de ambientes
+* **Netflix Eureka** para descoberta de serviços
+* **Spring Cloud Gateway** como ponto único de entrada HTTP
 
 ### Banco de dados
 
@@ -162,6 +164,8 @@ shopping-microservices/
 │   ├── pom.xml
 │   └── Dockerfile
 │
+├── api-gateway/
+├── eureka-server/
 ├── docker-compose.yml
 │
 └── README.md
@@ -308,13 +312,40 @@ cd shopping-microservices
 ### Subindo a infraestrutura
 
 ```bash
-docker compose up -d
+docker compose -f icompras-servicos/database/docker-compose.yml up -d
+docker compose -f icompras-servicos/broker/docker-compose.yml up -d
+docker compose -f icompras-servicos/bucket/docker-compose.yml up -d
 ```
+
+Os Compose sobem PostgreSQL, Kafka e RustFS. Depois, suba o Eureka:
+
+```bash
+./clientes/mvnw -pl eureka-server spring-boot:run
+```
+
+Em terminais separados, inicie os serviços e o gateway:
+
+```bash
+./clientes/mvnw -pl clientes spring-boot:run
+./clientes/mvnw -pl produtos spring-boot:run
+./clientes/mvnw -pl pedidos spring-boot:run
+./clientes/mvnw -pl faturamento spring-boot:run
+./clientes/mvnw -pl logistica spring-boot:run
+./clientes/mvnw -pl api-gateway spring-boot:run
+```
+
+Os microsserviços escolhem automaticamente uma porta livre e se registram no Eureka em `http://localhost:8761`. O gateway é o único ponto de entrada HTTP da aplicação em `http://localhost:8080`; as rotas mantêm os caminhos atuais (`/clientes`, `/produtos`, `/pedidos` e `/bucket`). O serviço de logística só processa eventos Kafka, portanto não possui rota HTTP.
+
+Em outro ambiente, configure `EUREKA_SERVER_URL` para o endereço do Eureka alcançável pelos serviços; `SERVER_PORT` pode ser definido para substituir a porta aleatória dos serviços ou a porta padrão do gateway/registry.
+
+Para usar o IntelliJ, abra o `pom.xml` da raiz do repositório como projeto Maven, aguarde a sincronização dos módulos e configure o Project SDK como Java 21. Inicie o Eureka antes dos clientes e do gateway. Se aparecer `Cannot execute request on any known server`, confirme que `http://localhost:8761` está acessível e que `EUREKA_SERVER_URL` aponta para `http://localhost:8761/eureka/`.
 
 Para verificar os containers:
 
 ```bash
-docker compose ps
+docker compose -f icompras-servicos/database/docker-compose.yml ps
+docker compose -f icompras-servicos/broker/docker-compose.yml ps
+docker compose -f icompras-servicos/bucket/docker-compose.yml ps
 ```
 
 ---
@@ -330,7 +361,7 @@ As APIs poderão ser testadas utilizando ferramentas como:
 Exemplo:
 
 ```bash
-curl http://localhost:8080/api/orders
+curl http://localhost:8080/pedidos
 ```
 
 ---

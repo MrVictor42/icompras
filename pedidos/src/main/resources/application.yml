@@ -23,15 +23,17 @@ spring:
             auto-offset-reset: earliest #Pega das mensagens mais antigas para as mais novas
 
 server:
-    port: 8082
+    port: ${SERVER_PORT:0}
+
+eureka:
+    client:
+        service-url:
+            defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    instance:
+        instance-id: ${spring.application.name}:${random.value}
+        prefer-ip-address: true
 
 icompras:
-    pedidos:
-        clients:
-            produtos:
-                url: "http://localhost:8080/produtos"
-            clientes:
-                url: "http://localhost:8081/clientes"
     config:
         kafka:
             topics:

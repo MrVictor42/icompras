@@ -16,7 +16,15 @@ icompras:
                 pedidos-faturados: "icompras.pedidos-faturados"
 
 server:
-    port: 8083
+    port: ${SERVER_PORT:0}
+
+eureka:
+    client:
+        service-url:
+            defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    instance:
+        instance-id: ${spring.application.name}:${random.value}
+        prefer-ip-address: true
 
 rustfs:
     url: "http://localhost:9000"

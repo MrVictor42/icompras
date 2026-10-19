@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "produtos", url = "${icompras.pedidos.clients.produtos.url}")
+@FeignClient(name = "produtos", path = "/produtos")
 public interface ProdutosClient {
 
     /*
